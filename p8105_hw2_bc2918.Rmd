@@ -1,13 +1,14 @@
 ---
 title: "Homework 2"
-author: Beibei Cao
-date: 2020-9-24
+author: "Beibei Cao"
+date: "2020-9-24"
 output: github_document
 ---
 
 This is my solution to Homework 2.
 
 ```{r setup, message = FALSE}
+# load libraries that will be used in this project
 library(tidyverse)
 library(readxl)
 ```
@@ -75,3 +76,35 @@ left_join(precip_df, month_df, by = "month")
 This dataset contains information from the Mr. Trashwheel trash collector in Baltimore, Maryland. As trash enters the inner harbor, the trashwheel collects that trash, and stores it in a dumpster. The dataset contains information on year, month, and trash collected, including some specific kinds of trash. There are a total of ``r nrow(trashwheel_df)`` rows in our final dataset. Additional date sheets include month precipitation data. 
 
 
+## Problem 2
+#### This problem focuses on NYC Transit data.
+
+Read and clean the NYC Transit data.
+
+```{r collapse = TRUE}
+# read NYC csv
+nyctransit_df = 
+  read_csv(
+    file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() 
+
+# check columns  
+colnames(nyctransit_df)
+
+# select wanted columns
+nyctransit_df = nyctransit_df[,c(2:18,20,23)]
+
+# preview and check which column with character (YES vs NO)
+str(nyctransit_df)
+  
+# convert entry variable (col 17-18, 'entry' and 'vending') from character (YES vs NO) to a logical variable
+ for (cl in c(17, 18)){
+  nyctransit_df[cl] = 
+    ifelse(nyctransit_df[cl] == "YES", TRUE, FALSE)
+}
+
+# check result
+str(nyctransit_df[17:18])
+```
+
+So far, we load the NYC Transit dataset, cleaned the names of columns, selected the desired columns and changed two column, `entry` and `vending`,  from `YES/NO` character variables to `TRUE/FALSE` logical variables. The dataset contained the following ``r ncol(nyctransit_df)`` variables: ``r names(nyctransit_df)``. There are now ``r nrow(nyctransit_df)`` rows in the dataset. 
