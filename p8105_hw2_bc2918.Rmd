@@ -67,8 +67,7 @@ month_df =
     month_name = month.name
   )
 
-precip_df = 
-  bind_rows(precip_2018, precip_2017)
+precip_df = bind_rows(precip_2018, precip_2017)
 
 left_join(precip_df, month_df, by = "month")
 ```
@@ -77,34 +76,108 @@ This dataset contains information from the Mr. Trashwheel trash collector in Bal
 
 
 ## Problem 2
-#### This problem focuses on NYC Transit data.
 
 Read and clean the NYC Transit data.
 
-```{r collapse = TRUE}
+```{r collapse = TRUE, results = 'hide', message = FALSE}
 # read NYC csv
 nyctransit_df = 
-  read_csv(
-    file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  read_csv(file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() 
 
 # check columns  
 colnames(nyctransit_df)
-
 # select wanted columns
 nyctransit_df = nyctransit_df[,c(2:18,20,23)]
-
-# preview and check which column with character (YES vs NO)
+# preview and check which column with character variable (YES vs NO)
 str(nyctransit_df)
-  
-# convert entry variable (col 17-18, 'entry' and 'vending') from character (YES vs NO) to a logical variable
+# convert entry variable (col 17-18, 'entry' and 'vending') from character variable (YES vs NO) to logical variable
  for (cl in c(17, 18)){
   nyctransit_df[cl] = 
     ifelse(nyctransit_df[cl] == "YES", TRUE, FALSE)
 }
-
-# check result
-str(nyctransit_df[17:18])
 ```
 
-So far, we load the NYC Transit dataset, cleaned the names of columns, selected the desired columns and changed two column, `entry` and `vending`,  from `YES/NO` character variables to `TRUE/FALSE` logical variables. The dataset contained the following ``r ncol(nyctransit_df)`` variables: ``r names(nyctransit_df)``. There are now ``r nrow(nyctransit_df)`` rows in the dataset. 
+Make sure the data frame looks like what we want.
+```{r collapse = TRUE}
+# check result
+str(nyctransit_df[17:18])
+
+# preview dataset
+colnames(nyctransit_df)
+```
+
+
+So far, we have loaded the NYC Transit dataset, cleaned the names of columns, selected the desired columns and changed two columns, `entry` and `vending`,  from `YES/NO` character variables to `TRUE/FALSE` logical variables. There are ``r nrow(nyctransit_df)`` rows and ``r ncol(nyctransit_df)`` columns in the dataset. The dataset contained the following variables: ``r names(nyctransit_df)``. 
+
+
+```{r collapse = TRUE}
+# keep distinct rows based on station name and line
+uniq_station_df = distinct(nyctransit_df, line, station_name, .keep_all = TRUE)
+
+# check the number of distinct stations as each row represent one distinct station
+nrow(uniq_station_df)
+
+# stations that are ADA compliant
+nrow(filter(uniq_station_df, ada == 'TRUE'))
+```
+
+There are `465` distinct stations and `84` of them are are ADA compliant.
+
+```{r collapse = TRUE}
+# proportion of station entrances/exits without vending allow entrance
+sum(nyctransit_df$vending == FALSE & nyctransit_df$entry == TRUE)/
+  sum(nyctransit_df$vending == FALSE)
+```
+
+There is `37.7%` station entrances/exits without vending allow entrance.
+
+Reformat the data to simplify the process of counting the number of distinct stations that serve the A train.
+
+```{r}
+# convert route8:route11 into character variables
+uniq_station_df[12:15] = sapply(uniq_station_df[12:15], as.character)
+
+# reformat data so that route number and route name are distinct variables
+reformed_df = pivot_longer(
+  uniq_station_df,
+  route1:route11,
+  names_to = "route",
+  values_to = "train"
+)
+```
+
+```{r collapse = TRUE}
+reformed_df %>% 
+  filter(train == "A") %>% 
+  distinct(line, station_name) %>% 
+  nrow()
+```
+
+There are `60` distinct stations serve the A train.
+
+```{r collapse = TRUE}
+reformed_df %>% 
+  filter(train == "A", ada == TRUE) %>% 
+  distinct(line, station_name) %>% 
+  nrow()
+```
+There are `17` distinct stations serve the A train that are ADA compliant.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
