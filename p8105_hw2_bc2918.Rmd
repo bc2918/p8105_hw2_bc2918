@@ -92,7 +92,7 @@ nyctransit_df = nyctransit_df[,c(2:18,20,23)]
 # preview and check which column with character variable (YES vs NO)
 str(nyctransit_df)
 # convert entry variable (col 17-18, 'entry' and 'vending') from character variable (YES vs NO) to logical variable
- for (cl in c(17, 18)){
+for (cl in c(17, 18)) {
   nyctransit_df[cl] = 
     ifelse(nyctransit_df[cl] == "YES", TRUE, FALSE)
 }
@@ -164,20 +164,79 @@ reformed_df %>%
 ```
 There are `17` distinct stations serve the A train that are ADA compliant.
 
+## Problem 3
 
+Read and clean the data in pols-month.csv.
 
+```{r collapse = TRUE, message = FALSE}
+# import data and separate mon column into year, month, day and drop day column
+pols_month_df = 
+  read_csv(file = "./data/pols-month.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(mon, c("year", "month", "day")) %>% 
+  subset(select = -day)
 
+# replace month number with month name
+pols_month_df$month = month.name[as.numeric(pols_month_df$month)]
 
+# create a president variable taking values gop and dem, and remove prez_dem and prez_gop
+pols_month_df$president = ifelse(pols_month_df$prez_dem == 1, 'dem', 'gop')
+pols_month_df = subset(pols_month_df, select = -c(prez_dem, prez_gop))
+```
 
+Take a look of the pols-month csv after cleaning 
 
+```{r}
+pols_month_df
+```
 
+Read and clean the data in snp.csv.
 
+```{r collapse = TRUE, message = FALSE}
+# import data and separate date column into year, month, day and drop day column
+snp_df = 
+  read_csv(file = "./data/snp.csv") %>% 
+  janitor::clean_names()  %>% 
+  separate(date, c("month", "day", "year")) %>% 
+  subset(select = -day) %>% 
+  relocate(year)
 
+# replace month number with month name
+snp_df$month = month.name[as.numeric(snp_df$month)]
 
+```
 
+Take a look of the snp csv after cleaning 
 
+```{r}
+snp_df
+```
 
+Read and clean the data in unemployment.csv.
 
+```{r collapse = TRUE, message = FALSE}
+# import data rename month columns
+unemployment_df = 
+  read_csv(file = "./data/unemployment.csv") %>% 
+  janitor::clean_names()  
+colnames(unemployment_df)[2:13] = month.name
+
+unemployment_df = pivot_longer(
+  unemployment_df,
+  January:December,
+  names_to = 'month',
+  values_to = 'percent_unemployment' 
+)
+
+unemployment_df[1] = sapply(unemployment_df[1], as.character)
+
+```
+
+Take a look of the unemployment csv after cleaning 
+
+```{r}
+unemployment_df
+```
 
 
 
