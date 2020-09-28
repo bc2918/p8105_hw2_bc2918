@@ -215,7 +215,7 @@ snp_df$month = month.name[as.numeric(snp_df$month)]
 
 ```
 
-Check the snp data after cleaning 
+Check the snp data after cleaning. 
 
 ```{r}
 snp_df
@@ -243,7 +243,7 @@ unemployment_df[1] = sapply(unemployment_df[1], as.character)
 
 ```
 
-Check the unemployment data after cleaning 
+Check the unemployment data after cleaning. 
 
 ```{r}
 unemployment_df
