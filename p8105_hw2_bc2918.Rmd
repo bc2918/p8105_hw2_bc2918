@@ -238,7 +238,7 @@ unemployment_df = pivot_longer(
   values_to = 'unemployment' 
 )
 
-# change the type of year to character to 
+# change the type of year to character
 unemployment_df[1] = sapply(unemployment_df[1], as.character)
 
 ```
