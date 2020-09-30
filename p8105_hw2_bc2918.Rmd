@@ -264,7 +264,7 @@ merged_df
 ```
 
 Get year ranges for each data set.
-```{r}
+```{r collapse = TRUE}
 range(as.numeric(pols_month_df$year))
 range(as.numeric(snp_df$year))
 range(as.numeric(unemployment_df$year))
